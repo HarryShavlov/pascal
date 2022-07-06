@@ -1,0 +1,76 @@
+program Pad_tela;
+   uses Crt, Graph;
+   const H=1500; r=0.1; kvz =0.0182; c=0.4; psh=800; pv=1.29; g=9.8;
+     var gD, gM, t0m, v0m, tm, vm, am, ym, k, j, z, bt, bv, ba, i: integer;
+         m, v0, v1, a0, a1, s0, s1, t0, t1, dt, k1, k2, at, av, aa, kt, ky, ka, kv : real;
+         mast, masv, mass, masa : array[1..2000] of real; ats, avs, aas: string;
+BEGIN
+	m:= 4/3*pi*exp(3*ln(r))*psh;
+	dt :=sqrt (2*H/g)/100;
+	k1:= 6*pi*kvz*r; k2:= 0.5*c*pi*sqr(r)*pv;
+	j:=0; t0:=0; s0:=0; v0:=0; a0:=g;
+	repeat
+		j:=j + 1;
+		t1:= t0+dt;
+		s1 := s0 + v0*dt + a0*sqr(dt)/2;
+		v1 := v0 +a0*dt;
+		a1:= (m*g - k1*v1 - k2* sqr (v1))/m;
+		mast[j]:=t1; mass[j]:=s1; masv[j]:=v1; masa[j]:=a1;
+		t0:=t1; s0:=s1; v0:=v1; a0:=a1;
+	until s1>=H;
+	if j < 25 then k:=1 else if j<40 then k:=2 else k:= round(j/20);
+	clrscr;
+ 	writeln('Shag z   Vremya t    Put S    Skorost V    Uskorenie a ');
+	for z:= 1 to j do if (z mod k) =0 then writeln(z:5,' ',mast[z]:10:4, ' ',mass[z]:10:2,' ',masv[z]:10:4, '    ',masa[z]:6:4);
+	writeln(j:5,' ',mast[j]:10:4,' ',mass[j]:10:2,' ',masv[j]:6:4,'    ', masa[j]:4:4);
+	readln;
+	gD:=Detect; Initgraph(gD,gM,'E:\BGI ');
+	t0m:= 40; v0m:=420;
+	bt:= 50;
+	bv:= 50;
+	ba:= 50;
+	at:=3;
+	av:=10;
+	aa:=2;
+	setbkcolor(15); setcolor(1);
+	line(10, v0m, 620, v0m); line(615, v0m - 5, 620, v0m);
+	line(615, v0m + 5, 620, v0m); outtextxy(630, v0m, 't');
+	line(t0m, 15, t0m, 460); line(t0m - 10, 25, t0m, 15);
+	line(t0m + 10, 25, t0m, 15); outtextxy(t0m, 5, 'V/à');
+	for i:= 1 to 10 do line(t0m + i*bt, v0m - 5, t0m + i*bt, v0m + 5);
+	for i:= 1 to 10 do line(t0m- 5, v0m - i*bv, t0m + 5, v0m - i*bv);
+	outtextxy(t0m - 8, v0m + 8, 'O');
+	str(at : 1 : 0, ats); outtextxy(t0m + bt, v0m + 8, ats);
+	str(av : 1: 0, avs);
+	str(aa : 1: 0, aas); outtextxy(t0m - 40, v0m - bv, avs+'/'+aas);
+	kt:= bt / at ; kv:= bv / av ; ka:= ba / aa ;
+	for z:=1 to j do
+		begin
+			tm:= round(t0m + kt*mast[z]);
+			vm:= round(v0m - kv*masv[z]);
+			setcolor(2);
+			circle(tm,vm,1);
+			am:= round(v0m - ka*masa[z]);
+			setcolor(4);
+			circle(tm,am,1);
+		end;
+	readkey;
+	cleardevice; setcolor(1); circle(300,50,5);
+	setfillstyle(5,2); bar(200,420,400,430);
+	readkey;
+	setcolor(0); circle(300,50,5);
+	t0:=0; s0:=0; v0:=0; a0:=g;
+	repeat
+		t1:= t0+dt;
+		s1:= s0+v0*dt+a0*sqr(dt)/2;
+		v1:= v0+a0*dt;
+		a1:= (m*g - k1*v1 - k2* sqr (v1))/m;
+		ky := (420 - 50)/H;
+		ym:= round(50 + ky*s1);
+		setcolor(1); circle(300,ym,5); delay(450);
+		setcolor(0); circle(300,ym,5);
+		t0:=t1; s0:=s1; v0:=v1; a0:=a1;
+	until s1>=H;
+	setcolor(1); circle(300,415,5);
+	readkey; closegraph;
+END.
